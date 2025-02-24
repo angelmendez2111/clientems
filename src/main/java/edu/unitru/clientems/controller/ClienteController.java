@@ -3,6 +3,8 @@ package edu.unitru.clientems.controller;
 import edu.unitru.clientems.model.Cliente;
 import edu.unitru.clientems.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,15 +30,15 @@ public class ClienteController {
 
     // Crear un nuevo cliente
     @PostMapping
-    public Cliente crearCliente(@RequestBody Cliente cliente) {
-        return clienteService.crearCliente(cliente);
+    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
+        return new ResponseEntity<>(clienteService.crearCliente(cliente), HttpStatus.CREATED) ;
     }
 
     // Actualizar un cliente existente
     @PutMapping("/{id}")
-    public Cliente actualizarCliente(@PathVariable int id, @RequestBody Cliente cliente) {
+    public ResponseEntity<?> actualizarCliente(@PathVariable int id, @RequestBody Cliente cliente) {
         cliente.setClientId(id);
-        return clienteService.actualizarCliente(cliente);
+        return new ResponseEntity<>(clienteService.actualizarCliente(cliente), HttpStatus.OK);
     }
 
     // Eliminar un cliente por ID

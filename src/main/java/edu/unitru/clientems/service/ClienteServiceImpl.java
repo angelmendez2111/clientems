@@ -1,7 +1,10 @@
 package edu.unitru.clientems.service;
+import edu.unitru.clientems.exception.NotFoundException;
 import edu.unitru.clientems.model.Cliente;
 import edu.unitru.clientems.repository.ClienteRepository;
 import edu.unitru.clientems.service.ClienteService;
+import lombok.extern.log4j.Log4j2;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Log4j2
 public class ClienteServiceImpl implements ClienteService {
 
     @Autowired
@@ -32,7 +36,11 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public Cliente actualizarCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
+        log.info("Client id: "+ cliente.getClientId());
+        if(clienteRepository.findById(cliente.getClientId()).isPresent()){
+            return clienteRepository.save(cliente);
+        }
+        throw new NotFoundException("Cliente no encontrado");
     }
 
     @Override
