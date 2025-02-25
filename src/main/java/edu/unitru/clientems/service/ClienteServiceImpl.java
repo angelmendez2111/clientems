@@ -24,9 +24,9 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente obtenerClientePorId(int id) {
+    public Cliente getClientById(int id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
-        return cliente.orElse(null);
+        return cliente.orElseThrow(()->new NotFoundException("Cliente no encontrado"));
     }
 
     @Override
@@ -45,6 +45,12 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public void eliminarCliente(int id) {
-        clienteRepository.deleteById(id);
+        if(clienteRepository.findById(id).isPresent()){
+            clienteRepository.deleteById(id);
+        }
+        else {
+            throw new NotFoundException("Cliente no encontrado");
+        }
+
     }
 }

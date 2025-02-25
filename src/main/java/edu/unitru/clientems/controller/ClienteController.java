@@ -24,8 +24,8 @@ public class ClienteController {
 
     // Obtener un cliente por ID
     @GetMapping("/{id}")
-    public Cliente obtenerClientePorId(@PathVariable int id) {
-        return clienteService.obtenerClientePorId(id);
+    public ResponseEntity<Cliente> getClientById(@PathVariable int id) {
+        return new ResponseEntity<>(clienteService.getClientById(id), HttpStatus.OK) ;
     }
 
     // Crear un nuevo cliente
@@ -43,7 +43,8 @@ public class ClienteController {
 
     // Eliminar un cliente por ID
     @DeleteMapping("/{id}")
-    public void eliminarCliente(@PathVariable int id) {
+    public ResponseEntity<String> eliminarCliente(@PathVariable int id) {
         clienteService.eliminarCliente(id);
+        return ResponseEntity.ok("Cliente eliminado.");
     }
 }
