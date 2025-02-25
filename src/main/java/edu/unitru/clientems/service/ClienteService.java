@@ -1,6 +1,6 @@
 package edu.unitru.clientems.service;
 
-import edu.unitru.clientems.model.Cliente;
+import edu.unitru.clientems.repository.entity.Cliente;
 import java.util.List;
 
 public interface ClienteService {

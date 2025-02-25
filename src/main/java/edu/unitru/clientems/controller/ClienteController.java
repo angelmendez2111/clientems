@@ -1,7 +1,9 @@
 package edu.unitru.clientems.controller;
 
-import edu.unitru.clientems.model.Cliente;
+import edu.unitru.clientems.model.ClientRequest;
+import edu.unitru.clientems.repository.entity.Cliente;
 import edu.unitru.clientems.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +32,10 @@ public class ClienteController {
 
     // Crear un nuevo cliente
     @PostMapping
-    public ResponseEntity<Cliente> crearCliente(@RequestBody Cliente cliente) {
-        return new ResponseEntity<>(clienteService.crearCliente(cliente), HttpStatus.CREATED) ;
+    public ResponseEntity<Cliente> crearCliente(@Valid @RequestBody ClientRequest clientRequest) {
+        Cliente client = new Cliente();
+        client.setNombre(clientRequest.getNombre());
+        return new ResponseEntity<>(clienteService.crearCliente(client), HttpStatus.CREATED) ;
     }
 
     // Actualizar un cliente existente

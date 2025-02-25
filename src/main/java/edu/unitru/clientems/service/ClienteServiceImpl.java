@@ -1,10 +1,8 @@
 package edu.unitru.clientems.service;
 import edu.unitru.clientems.exception.NotFoundException;
-import edu.unitru.clientems.model.Cliente;
+import edu.unitru.clientems.repository.entity.Cliente;
 import edu.unitru.clientems.repository.ClienteRepository;
-import edu.unitru.clientems.service.ClienteService;
 import lombok.extern.log4j.Log4j2;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
