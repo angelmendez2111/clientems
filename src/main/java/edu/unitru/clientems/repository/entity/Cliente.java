@@ -1,4 +1,4 @@
-package edu.unitru.clientems.model;
+package edu.unitru.clientems.repository.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
