@@ -21,7 +21,7 @@ public class ClienteController {
 
     // Listar todos los clientes
     @GetMapping
-    public List<Cliente> listarClientes() {
+    public List<ClientResponse> listarClientes() {
         return clienteService.listarClientes();
     }
 
@@ -38,10 +38,12 @@ public class ClienteController {
     }
 
     // Actualizar un cliente existente
+    // Actualizar un cliente existente
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> actualizarCliente(@PathVariable int id, @RequestBody ClientRequest clientRequest) {
+    public ResponseEntity<ClientResponse> actualizarCliente(@PathVariable int id, @Valid @RequestBody ClientRequest clientRequest) {
         return new ResponseEntity<>(clienteService.actualizarClienteDesdeRequest(id, clientRequest), HttpStatus.OK);
     }
+
 
     // Eliminar un cliente por ID
     @DeleteMapping("/{id}")

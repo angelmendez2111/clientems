@@ -1,4 +1,5 @@
 package edu.unitru.clientems.service;
+
 import edu.unitru.clientems.exception.NotFoundException;
 import edu.unitru.clientems.model.ClientRequest;
 import edu.unitru.clientems.model.ClientResponse;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -19,72 +21,73 @@ public class ClienteServiceImpl implements ClienteService {
     private ClienteRepository clienteRepository;
 
     @Override
-    public List<Cliente> listarClientes() {
-        return clienteRepository.findAll();
+    public List<ClientResponse> listarClientes() {
+        List<Cliente> clientes = clienteRepository.findAll();
+        return clientes.stream()
+                .map(this::convertirAResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ClientResponse getClientById(int id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
-
-        // Convertimos de Cliente (Entidad) a ClientResponse (DTO)
-        ClientResponse response = new ClientResponse();
-        response.setClientId(cliente.getClientId());
-        response.setNombre(cliente.getNombre());
-        response.setApellido(cliente.getApellido());
-
-        return response;
+        return convertirAResponse(cliente);
     }
-
 
     @Override
     public Cliente crearCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
+        return null;
     }
 
     @Override
     public Cliente actualizarCliente(Cliente cliente) {
-        log.info("Client id: "+ cliente.getClientId());
-        if(clienteRepository.findById(cliente.getClientId()).isPresent()){
-            return clienteRepository.save(cliente);
-        }
-        throw new NotFoundException("Cliente no encontrado");
-    }
-
-    @Override
-    public void eliminarCliente(int id) {
-        if(clienteRepository.findById(id).isPresent()){
-            clienteRepository.deleteById(id);
-        }
-        else {
-            throw new NotFoundException("Cliente no encontrado");
-        }
-
+        return null;
     }
 
     @Override
     public Cliente crearClienteDesdeRequest(ClientRequest clientRequest) {
-        Cliente client = new Cliente();
-        client.setNombre(clientRequest.getNombre());
-        client.setApellido(clientRequest.getApellido());
-        client.setDireccion(clientRequest.getDireccion());
-        client.setEdad(clientRequest.getEdad());
-        return clienteRepository.save(client);
+        Cliente cliente = convertirAEntity(clientRequest);
+        return clienteRepository.save(cliente);
     }
 
     @Override
-    public Cliente actualizarClienteDesdeRequest(int id, ClientRequest clientRequest) {
-        Optional<Cliente> clienteExistente = clienteRepository.findById(id);
-        if (clienteExistente.isPresent()) {
-            Cliente cliente = clienteExistente.get();
-            cliente.setNombre(clientRequest.getNombre());
-            cliente.setApellido(clientRequest.getApellido());
-            cliente.setDireccion(clientRequest.getDireccion());
-            cliente.setEdad(clientRequest.getEdad());
-            return clienteRepository.save(cliente);
-        }
-        throw new NotFoundException("Cliente no encontrado");
+    public ClientResponse actualizarClienteDesdeRequest(int id, ClientRequest clientRequest) {
+        Cliente clienteExistente = clienteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
+
+        clienteExistente.setNombre(clientRequest.getNombre());
+        clienteExistente.setApellido(clientRequest.getApellido());
+        clienteExistente.setDireccion(clientRequest.getDireccion());
+        clienteExistente.setEdad(clientRequest.getEdad());
+
+        Cliente clienteActualizado = clienteRepository.save(clienteExistente);
+        return convertirAResponse(clienteActualizado);
     }
 
+    @Override
+    public void eliminarCliente(int id) {
+        if (clienteRepository.findById(id).isPresent()) {
+            clienteRepository.deleteById(id);
+        } else {
+            throw new NotFoundException("Cliente no encontrado");
+        }
+    }
+
+    private Cliente convertirAEntity(ClientRequest clientRequest) {
+        Cliente cliente = new Cliente();
+        cliente.setNombre(clientRequest.getNombre());
+        cliente.setApellido(clientRequest.getApellido());
+        cliente.setDireccion(clientRequest.getDireccion());
+        cliente.setEdad(clientRequest.getEdad());
+        return cliente;
+    }
+
+    private ClientResponse convertirAResponse(Cliente cliente) {
+        ClientResponse response = new ClientResponse();
+        response.setClientId(cliente.getClientId());
+        response.setNombre(cliente.getNombre());
+        response.setApellido(cliente.getApellido());
+        return response;
+    }
 }

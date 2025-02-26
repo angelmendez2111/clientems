@@ -8,17 +8,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ErrorExceptionHandler {
-
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundExceptionHandler(NotFoundException notFoundException){
-        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), notFoundException.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse notFoundExceptionHandler(MethodArgumentNotValidException methodArgumentNotValidException){
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), methodArgumentNotValidException.getMessage());
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
+        // Extrae el primer mensaje de error
+        String mensajeError = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse("Error de validación");
+
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), mensajeError);
     }
+
 
 }
