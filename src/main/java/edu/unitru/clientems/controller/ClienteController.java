@@ -35,6 +35,9 @@ public class ClienteController {
     public ResponseEntity<Cliente> crearCliente(@Valid @RequestBody ClientRequest clientRequest) {
         Cliente client = new Cliente();
         client.setNombre(clientRequest.getNombre());
+        client.setApellido(clientRequest.getApellido());
+        client.setDireccion(clientRequest.getDireccion());
+        client.setEdad(clientRequest.getEdad());
         return new ResponseEntity<>(clienteService.crearCliente(client), HttpStatus.CREATED) ;
     }
 
