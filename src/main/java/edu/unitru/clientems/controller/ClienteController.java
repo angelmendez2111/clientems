@@ -1,6 +1,7 @@
 package edu.unitru.clientems.controller;
 
 import edu.unitru.clientems.model.ClientRequest;
+import edu.unitru.clientems.model.ClientResponse;
 import edu.unitru.clientems.repository.entity.Cliente;
 import edu.unitru.clientems.service.ClienteService;
 import jakarta.validation.Valid;
@@ -26,26 +27,20 @@ public class ClienteController {
 
     // Obtener un cliente por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClientById(@PathVariable int id) {
+    public ResponseEntity<ClientResponse> getClientById(@PathVariable int id) {
         return new ResponseEntity<>(clienteService.getClientById(id), HttpStatus.OK) ;
     }
 
     // Crear un nuevo cliente
     @PostMapping
     public ResponseEntity<Cliente> crearCliente(@Valid @RequestBody ClientRequest clientRequest) {
-        Cliente client = new Cliente();
-        client.setNombre(clientRequest.getNombre());
-        client.setApellido(clientRequest.getApellido());
-        client.setDireccion(clientRequest.getDireccion());
-        client.setEdad(clientRequest.getEdad());
-        return new ResponseEntity<>(clienteService.crearCliente(client), HttpStatus.CREATED) ;
+        return new ResponseEntity<>(clienteService.crearClienteDesdeRequest(clientRequest), HttpStatus.CREATED);
     }
 
     // Actualizar un cliente existente
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarCliente(@PathVariable int id, @RequestBody Cliente cliente) {
-        cliente.setClientId(id);
-        return new ResponseEntity<>(clienteService.actualizarCliente(cliente), HttpStatus.OK);
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable int id, @RequestBody ClientRequest clientRequest) {
+        return new ResponseEntity<>(clienteService.actualizarClienteDesdeRequest(id, clientRequest), HttpStatus.OK);
     }
 
     // Eliminar un cliente por ID
