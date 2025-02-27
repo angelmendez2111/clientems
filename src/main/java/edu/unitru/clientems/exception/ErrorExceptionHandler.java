@@ -21,6 +21,4 @@ public class ErrorExceptionHandler {
 
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), mensajeError);
     }
-
-
 }

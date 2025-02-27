@@ -7,4 +7,5 @@ public class ClientResponse {
     private int clientId;
     private String nombre;
     private String apellido;
+    private Integer amount;
 }

@@ -1,11 +1,14 @@
 package edu.unitru.clientems.service;
 
 import edu.unitru.clientems.exception.NotFoundException;
+import edu.unitru.clientems.feign.MockyClient;
 import edu.unitru.clientems.model.ClientRequest;
 import edu.unitru.clientems.model.ClientResponse;
 import edu.unitru.clientems.repository.entity.Cliente;
 import edu.unitru.clientems.repository.ClienteRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,35 +17,41 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Log4j2
+@Slf4j
 public class ClienteServiceImpl implements ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private MockyClient mockyClient;
+
     @Override
     public List<ClientResponse> listarClientes() {
         List<Cliente> clientes = clienteRepository.findAll();
         return clientes.stream()
-                .map(this::convertirAResponse)
+                .map(cliente-> this.convertirAResponse(cliente, 0))
                 .collect(Collectors.toList());
     }
 
     @Override
     public ClientResponse getClientById(int id) {
+        // Obtener el cliente desde la base de datos
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
-        return convertirAResponse(cliente);
-    }
 
-    @Override
-    public Cliente crearCliente(Cliente cliente) {
-        return null;
-    }
+        Integer monto=0;
+        // Llamar al servicio externo con Feign
+        var response = mockyClient.obtenerMonto();
+        if (response.getStatusCode().is2xxSuccessful()) {
+            monto = response.getBody().get("amount");
+           log.info("Monto obtenido: " + monto);
+        } else {
+            System.out.println("Error al obtener el monto");
+        }
 
-    @Override
-    public Cliente actualizarCliente(Cliente cliente) {
-        return null;
+        // Retornar el response del cliente
+        return convertirAResponse(cliente, monto);
     }
 
     @Override
@@ -62,7 +71,7 @@ public class ClienteServiceImpl implements ClienteService {
         clienteExistente.setEdad(clientRequest.getEdad());
 
         Cliente clienteActualizado = clienteRepository.save(clienteExistente);
-        return convertirAResponse(clienteActualizado);
+        return convertirAResponse(clienteActualizado, 0);
     }
 
     @Override
@@ -83,11 +92,12 @@ public class ClienteServiceImpl implements ClienteService {
         return cliente;
     }
 
-    private ClientResponse convertirAResponse(Cliente cliente) {
+    private ClientResponse convertirAResponse(Cliente cliente, Integer amount) {
         ClientResponse response = new ClientResponse();
         response.setClientId(cliente.getClientId());
         response.setNombre(cliente.getNombre());
         response.setApellido(cliente.getApellido());
+        response.setAmount(amount);
         return response;
     }
 }

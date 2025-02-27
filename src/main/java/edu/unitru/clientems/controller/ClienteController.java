@@ -19,33 +19,26 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
-    // Listar todos los clientes
     @GetMapping
     public List<ClientResponse> listarClientes() {
         return clienteService.listarClientes();
     }
 
-    // Obtener un cliente por ID
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponse> getClientById(@PathVariable int id) {
         return new ResponseEntity<>(clienteService.getClientById(id), HttpStatus.OK) ;
     }
 
-    // Crear un nuevo cliente
     @PostMapping
     public ResponseEntity<Cliente> crearCliente(@Valid @RequestBody ClientRequest clientRequest) {
         return new ResponseEntity<>(clienteService.crearClienteDesdeRequest(clientRequest), HttpStatus.CREATED);
     }
 
-    // Actualizar un cliente existente
-    // Actualizar un cliente existente
     @PutMapping("/{id}")
     public ResponseEntity<ClientResponse> actualizarCliente(@PathVariable int id, @Valid @RequestBody ClientRequest clientRequest) {
         return new ResponseEntity<>(clienteService.actualizarClienteDesdeRequest(id, clientRequest), HttpStatus.OK);
     }
 
-
-    // Eliminar un cliente por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarCliente(@PathVariable int id) {
         clienteService.eliminarCliente(id);
