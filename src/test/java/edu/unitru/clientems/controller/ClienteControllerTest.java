@@ -91,5 +91,47 @@ class ClienteControllerTest {
     }
 
 
+    @Test
+    void shouldUpdateClientSuccessfully() {
+        // Datos de prueba
+        int clientId = 1;
+        ClientRequest clientRequest = new ClientRequest();
+        clientRequest.setNombre("Carlos");
+        clientRequest.setApellido("Lopez");
+
+        ClientResponse updatedClientResponse = new ClientResponse();
+        updatedClientResponse.setClientId(clientId);
+        updatedClientResponse.setNombre("Carlos");
+        updatedClientResponse.setApellido("Lopez");
+
+        // Configurar mock
+        when(clienteService.actualizarClienteDesdeRequest(clientId, clientRequest)).thenReturn(updatedClientResponse);
+
+        // Ejecutar el metodo a probar
+        ResponseEntity<ClientResponse> response = clienteController.actualizarCliente(clientId, clientRequest);
+
+        // Verificaciones
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getClientId()).isEqualTo(clientId);
+        assertThat(response.getBody().getNombre()).isEqualTo("Carlos");
+        assertThat(response.getBody().getApellido()).isEqualTo("Lopez");
+    }
+
+    @Test
+    void shouldDeleteClientSuccessfully() {
+        // Datos de prueba
+        int clientId = 1;
+
+        // No es necesario configurar un mock porque eliminarCliente() no devuelve un valor
+
+        // Ejecutar el método a probar
+        ResponseEntity<String> response = clienteController.eliminarCliente(clientId);
+
+        // Verificaciones
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Cliente eliminado.");
+
+    }
+
 
 }
