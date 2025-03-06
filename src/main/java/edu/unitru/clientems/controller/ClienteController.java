@@ -44,4 +44,10 @@ public class ClienteController {
         clienteService.eliminarCliente(id);
         return ResponseEntity.ok("Cliente eliminado.");
     }
+
+    @PostMapping("/message")
+    public ResponseEntity<Void> sendMessage( ) {
+        clienteService.sendMessage();
+        return ResponseEntity.ok().build() ;
+    }
 }

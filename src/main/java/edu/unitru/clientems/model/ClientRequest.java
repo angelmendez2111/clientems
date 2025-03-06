@@ -24,4 +24,7 @@ public class ClientRequest {
     @Min(value = 18, message = "La edad debe ser mayor o igual que 18")
     @Max(value = 80, message = "La edad no puede ser mayor que 80")
     private int edad;
+
+
+    private String numerotelf;
 }

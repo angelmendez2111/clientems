@@ -11,4 +11,5 @@ public interface ClienteService {
     void eliminarCliente(int id);
     Cliente crearClienteDesdeRequest(ClientRequest clientRequest);
     ClientResponse actualizarClienteDesdeRequest(int id, ClientRequest clientRequest);
+    void sendMessage();
 }

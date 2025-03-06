@@ -1,6 +1,8 @@
 package edu.unitru.clientems.service;
 
 import edu.unitru.clientems.exception.NotFoundException;
+import edu.unitru.clientems.feign.ApiWsppClient;
+import edu.unitru.clientems.feign.MessageRequest;
 import edu.unitru.clientems.feign.MockyClient;
 import edu.unitru.clientems.model.ClientRequest;
 import edu.unitru.clientems.model.ClientResponse;
@@ -10,6 +12,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,14 +26,17 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    //@Autowired
+    //private MockyClient mockyClient;
+
     @Autowired
-    private MockyClient mockyClient;
+    private ApiWsppClient apiWsppClient;
 
     @Override
     public List<ClientResponse> listarClientes() {
         List<Cliente> clientes = clienteRepository.findAll();
         return clientes.stream()
-                .map(cliente-> this.convertirAResponse(cliente, 0))
+                .map(cliente-> this.convertirAResponse(cliente))
                 .collect(Collectors.toList());
     }
 
@@ -40,7 +46,8 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
 
-        Integer monto=0;
+        /*
+        * Integer monto=0;
         // Llamar al servicio externo con Feign
         var response = mockyClient.obtenerMonto();
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -48,10 +55,10 @@ public class ClienteServiceImpl implements ClienteService {
            log.info("Monto obtenido: " + monto);
         } else {
             System.out.println("Error al obtener el monto");
-        }
+        }*/
 
         // Retornar el response del cliente
-        return convertirAResponse(cliente, monto);
+        return convertirAResponse(cliente);
     }
 
     @Override
@@ -71,7 +78,24 @@ public class ClienteServiceImpl implements ClienteService {
         clienteExistente.setEdad(clientRequest.getEdad());
 
         Cliente clienteActualizado = clienteRepository.save(clienteExistente);
-        return convertirAResponse(clienteActualizado, 0);
+        return convertirAResponse(clienteActualizado);
+    }
+
+    @Override
+    public void sendMessage() {
+        clienteRepository.findAll().forEach(client->{
+            MessageRequest messageRequest = new MessageRequest();
+            messageRequest.setNumber(client.getNumerotelf());
+            messageRequest.setMessage("Hola " + client.getNombre() + " " + client.getApellido());
+            ResponseEntity<String> response = apiWsppClient.sendMessage(messageRequest);
+            if (response.getStatusCode().is2xxSuccessful()){
+                log.info("message sent");
+            }else {
+                log.error("message error");
+            }
+
+        });
+
     }
 
     @Override
@@ -92,12 +116,14 @@ public class ClienteServiceImpl implements ClienteService {
         return cliente;
     }
 
-    private ClientResponse convertirAResponse(Cliente cliente, Integer amount) {
+    private ClientResponse convertirAResponse(Cliente cliente) {
         ClientResponse response = new ClientResponse();
         response.setClientId(cliente.getClientId());
         response.setNombre(cliente.getNombre());
         response.setApellido(cliente.getApellido());
-        response.setAmount(amount);
+       // response.setAmount(amount);
         return response;
     }
+
+
 }
