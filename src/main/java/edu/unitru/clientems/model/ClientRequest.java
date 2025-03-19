@@ -17,11 +17,14 @@ public class ClientRequest {
     @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$", message = "El apellido no debe contener números ni caracteres especiales")
     private String apellido;
 
-    @Length(min = 5, max = 10)
+    @Length(min = 5, max = 50)
     private String direccion;
 
-    @Positive
-    @Min(value = 18)
-    @Max(value = 80)
+    @Positive(message = "La edad debe ser un número positivo")
+    @Min(value = 18, message = "La edad debe ser mayor o igual que 18")
+    @Max(value = 80, message = "La edad no puede ser mayor que 80")
     private int edad;
+
+
+    private String numerotelf;
 }
